@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api from "../../lib/api";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../lib/constants.ts";
 import { Button } from "@/components/ui/button"
@@ -17,7 +17,7 @@ const AuthForm: React.FC<FormProps> = ({ route, method }) => {
   const [password, setPassword] = useState<string>("");
   const [email, setEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const {toast} = useToast();
 
   const name = method === "login" ? "Login" : "Register";
@@ -39,9 +39,9 @@ const AuthForm: React.FC<FormProps> = ({ route, method }) => {
         localStorage.setItem(ACCESS_TOKEN, res.data.access);
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
         localStorage.setItem("IS_LOGGED_IN", "true");
-        // navigate("/dashboard");
+        navigate("/dashboard");
       } else {
-        // navigate("/login");
+        navigate("/login");
       }
     } catch (error: any) {
       const message = error.response?.data?.detail || "An error occurred. Please try again.";
