@@ -2,6 +2,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { checkAuth } from "./features/authSlice.ts";
 import { useEffect } from "react";
+import { UserNavbar } from "./components/Navbars/UserNavbar.tsx";
 
 function Layout() {
   const dispatch = useDispatch();
@@ -47,7 +48,8 @@ function ProtectedRoute() {
   ) : (
     <div className=" flex flex-col  min-h-screen w-full space-y-4">
       <div className="navbar">
-      <h1>nav in</h1>
+      <UserNavbar/>
+
       </div>
       <div className=" pt-20 w-full px-[4vw]">
         <Outlet />
