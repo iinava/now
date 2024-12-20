@@ -157,3 +157,34 @@ export const users = [
       status: "Active",
     },
   ];
+  
+export const productIdeas = [
+    {
+      id: '1',
+      title: 'Smart Plant Pot',
+      description: 'A self-watering pot that monitors soil moisture and plant health.',
+      imageUrl: '/placeholder.svg?height=200&width=300',
+      category: 'Home Automation'
+    },
+    {
+      id: '2',
+      title: 'Eco-friendly Water Bottle',
+      description: 'Reusable bottle that tracks water intake and purifies water on-the-go.',
+      imageUrl: '/placeholder.svg?height=200&width=300',
+      category: 'Health & Wellness'
+    },
+    {
+      id: '3',
+      title: 'AI Writing Assistant',
+      description: 'An AI-powered tool that helps improve writing style and grammar.',
+      imageUrl: '/placeholder.svg?height=200&width=300',
+      category: 'Software'
+    },
+    {
+      id: '4',
+      title: 'Virtual Reality Fitness',
+      description: 'Immersive VR workouts that make exercise fun and engaging.',
+      imageUrl: '/placeholder.svg?height=200&width=300',
+      category: 'Fitness'
+    }
+]
