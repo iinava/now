@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import {Layout,ProtectedRoute} from "./layout";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import HomePage from "./pages/home/Homepage";
 
 
 function App() {
@@ -34,7 +35,7 @@ function App() {
         },
         {
           path: "dashboard",
-          element: <h1>hi</h1>
+          element: <HomePage/>
         },
         {
           path:"campaigns/:slug",
