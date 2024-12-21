@@ -13,7 +13,7 @@ export default function HomePage() {
   const categories = ["All", "Home Automation", "Health & Wellness", "Software", "Fitness"];
 
   return (
-    <div className="container mx-auto py-4">
+    <div className="container mx-auto py-4 px-4">
       <h1 className="text-4xl font-bold mb-8 text-center">Product Ideas Showcase</h1>
       
       {/* Category Filter */}
