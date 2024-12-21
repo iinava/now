@@ -46,12 +46,12 @@ function ProtectedRoute() {
   return !isAuthorized ? (
     <Navigate to="/login" />
   ) : (
-    <div className=" flex flex-col  min-h-screen w-full space-y-4">
+    <div className=" flex flex-col  min-h-screen w-full">
       <div className="navbar">
       <UserNavbar/>
 
       </div>
-      <div className=" pt-20 w-full px-[4vw]">
+      <div className=" pt-0 w-full">
         <Outlet />
       </div>
     </div>

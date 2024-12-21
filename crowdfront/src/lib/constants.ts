@@ -188,3 +188,31 @@ export const productIdeas = [
       category: 'Fitness'
     }
 ]
+
+export const demoChats: any = {
+  '1': [
+    { id: 1, sender: 'John', content: 'Hey, how are you?' },
+    { id: 2, sender: 'You', content: "I'm good, thanks! How about you?" },
+    { id: 3, sender: 'John', content: 'Doing well, thanks for asking!' },
+  ],
+  '2': [
+    { id: 1, sender: 'Jane', content: 'Did you finish the project?' },
+    { id: 2, sender: 'You', content: 'Almost done, just need to add some final touches.' },
+    { id: 3, sender: 'Jane', content: "Great! Let me know when it's ready for review." },
+  ],
+  '3': [
+    { id: 1, sender: 'Bob', content: 'Are we still on for lunch tomorrow?' },
+    { id: 2, sender: 'You', content: 'Yes, definitely! Same place as usual?' },
+    { id: 3, sender: 'Bob', content: 'Sounds good, see you then!' },
+  ],
+  '4': [
+    { id: 1, sender: 'Alice', content: 'Have you seen the latest movie?' },
+    { id: 2, sender: 'You', content: 'Not yet, is it worth watching?' },
+    { id: 3, sender: 'Alice', content: 'You should check it out this weekend.' },
+  ],
+  '5': [
+    { id: 1, sender: 'Charlie', content: "Don't forget about the meeting at 3 PM." },
+    { id: 2, sender: 'You', content: "Thanks for the reminder. I'll be there." },
+    { id: 3, sender: 'Charlie', content: 'Great, see you in the conference room.' },
+  ],
+};
