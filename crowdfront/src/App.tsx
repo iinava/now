@@ -3,6 +3,9 @@ import {Layout,ProtectedRoute} from "./layout";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import HomePage from "./pages/home/Homepage";
+import Chat from "./components/Chat/Chat";
+import ChatPage from "./pages/Chats/ChatPage";
+import ChatLayout from "./pages/Chats/ChatLayout";
 
 
 function App() {
@@ -36,6 +39,20 @@ function App() {
         {
           path: "dashboard",
           element: <HomePage/>
+        },
+        {
+          path: '/chats',
+          element: <ChatLayout />,
+          children: [
+            {
+              path: '',
+              element: <Chat />,
+            },
+            {
+              path: ':id',
+              element: <ChatPage />,
+            },
+          ],
         },
         {
           path:"campaigns/:slug",
