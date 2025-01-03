@@ -6,6 +6,8 @@ import HomePage from "./pages/home/Homepage";
 import Chat from "./components/Chat/Chat";
 import ChatPage from "./pages/Chats/ChatPage";
 import ChatLayout from "./pages/Chats/ChatLayout";
+import Profilepage from "./pages/Profile/Profilepage";
+import ProjectIdeaPage from "./pages/home/ProjectDetails";
 
 
 function App() {
@@ -34,7 +36,7 @@ function App() {
       children: [
         {
           path: "profile",
-          element: <h1>hi</h1>
+          element: <Profilepage/>
         },
         {
           path: "dashboard",
@@ -55,8 +57,8 @@ function App() {
           ],
         },
         {
-          path:"campaigns/:slug",
-          element: <h1>hi</h1>
+          path:"projects/:slug",
+          element: <ProjectIdeaPage/>
         },
         {
           path:"campaign/category/:category",

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkAuth } from "./features/authSlice.ts";
 import { useEffect } from "react";
 import { UserNavbar } from "./components/Navbars/UserNavbar.tsx";
+import Footer from "./components/Footer.tsx";
 
 function Layout() {
   const dispatch = useDispatch();
@@ -54,6 +55,7 @@ function ProtectedRoute() {
       <div className=" pt-0 w-full">
         <Outlet />
       </div>
+      <Footer/>
     </div>
   );
 }

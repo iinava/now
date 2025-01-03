@@ -1,5 +1,5 @@
-import { Link, useLocation } from 'react-router-dom'; 
-import { User, Home, FileText, MessageCircle } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom'; 
+import { User, Home, MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,9 +13,11 @@ export function UserNavbar() {
 
   const navItems = [
     { href: '/', label: 'Home', icon: Home },
-    { href: '/posts', label: 'Posts', icon: FileText },
+    // { href: '/posts', label: 'Posts', icon: FileText },
     { href: '/chats', label: 'Chats', icon: MessageCircle },
   ];
+
+  const navigate = useNavigate(); 
 
   return (
     <nav className="bg-transparent border-b border-gray-700">
@@ -47,7 +49,7 @@ export function UserNavbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem  onClick={() => navigate("/profile")}>
                   <Link to="/profile" className="w-full">Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
