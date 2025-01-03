@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'; 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
   id: string;
@@ -30,7 +29,9 @@ export function ProjectCard({ id, title, description, imageUrl }: ProductCardPro
         <p className="text-muted-foreground">{description}</p>
       </CardContent>
       <CardFooter>
-        <Button variant="outline" className="w-full">Learn More</Button>
+      <Link to="/projects/2" className="w-full h-full border p-2 border-r-8 flex items-center justify-center">
+        Learn More
+      </Link>
       </CardFooter>
     </Card>
   );
