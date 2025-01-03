@@ -1,4 +1,5 @@
 import { ProjectCard } from "@/components/home/ProjectCard";
+import { EditProfileButton } from "@/components/profile/EditProfileModal";
 import PostModal from "@/components/profile/PostModal";
 import { Button } from "@/components/ui/button";
 import { productIdeas } from "@/lib/constants";
@@ -13,7 +14,7 @@ export default function Profilepage() {
       <h1>Bruce wayne</h1>
       <div className="flex gap-4 m-4">
         <Button>Message</Button>
-        <Button>Edit Profile</Button>
+        <EditProfileButton/>
         <PostModal/>
       </div>
       {/* Product Grid */}
