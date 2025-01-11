@@ -25,6 +25,7 @@ function Layout() {
       </div>
       <div className=" w-full  min-h-screen ">
         <Outlet />
+        <Toaster />
       </div>
     </div>
   );
@@ -53,6 +54,7 @@ function ProtectedRoute() {
       </div>
       <div className=" pt-0 w-full">
         <Outlet />
+        <Toaster />
       </div>
     </div>
   );
