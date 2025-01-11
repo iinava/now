@@ -48,7 +48,7 @@ const AuthForm: React.FC<FormProps> = ({ route, method }) => {
       toast({
         title: "Error",
         description: message,
-        variant: "destructive",
+        variant: "destructive",  
       });
     } finally {
       setLoading(false);
@@ -61,7 +61,6 @@ const AuthForm: React.FC<FormProps> = ({ route, method }) => {
       <p className="text-sm text-muted-foreground">
         Enter your personal details to create an account
       </p>
-
       <Input
         type="text"
         value={username}

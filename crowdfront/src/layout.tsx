@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkAuth } from "./features/authSlice.ts";
 import { useEffect } from "react";
 import { UserNavbar } from "./components/Navbars/UserNavbar.tsx";
+import { Toaster } from "./components/ui/toaster.tsx";
 import Footer from "./components/Footer.tsx";
 
 function Layout() {
@@ -26,6 +27,7 @@ function Layout() {
       </div>
       <div className=" w-full  min-h-screen ">
         <Outlet />
+        <Toaster />
       </div>
     </div>
   );
@@ -54,6 +56,7 @@ function ProtectedRoute() {
       </div>
       <div className=" pt-0 w-full">
         <Outlet />
+        <Toaster />
       </div>
       <Footer/>
     </div>
