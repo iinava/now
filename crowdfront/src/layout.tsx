@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkAuth } from "./features/authSlice.ts";
 import { useEffect } from "react";
 import { UserNavbar } from "./components/Navbars/UserNavbar.tsx";
+import { Toaster } from "./components/ui/toaster.tsx";
 
 function Layout() {
   const dispatch = useDispatch();
