@@ -4,6 +4,7 @@ import { checkAuth } from "./features/authSlice.ts";
 import { useEffect } from "react";
 import { UserNavbar } from "./components/Navbars/UserNavbar.tsx";
 import { Toaster } from "./components/ui/toaster.tsx";
+import Footer from "./components/Footer.tsx";
 
 function Layout() {
   const dispatch = useDispatch();
@@ -57,6 +58,7 @@ function ProtectedRoute() {
         <Outlet />
         <Toaster />
       </div>
+      <Footer/>
     </div>
   );
 }
