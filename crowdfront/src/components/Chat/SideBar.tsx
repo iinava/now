@@ -1,74 +1,59 @@
-import { useState } from "react"
-import { Link, useLocation } from "react-router-dom"
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
-
-import { Button } from "@/components/ui/button"
+import { useEffect } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '@/store/store'
+import { fetchChats, selectChats, selectChatsLoading } from '@/features/chatSlice'
 import { ScrollArea } from "@/components/ui/scroll-area"
-
-const chatList = [
-  { id: '1', name: 'John Doe' },
-  { id: '2', name: 'Jane Smith' },
-  { id: '3', name: 'Bob Johnson' },
-  { id: '4', name: 'Alice Williams' },
-  { id: '5', name: 'Charlie Brown' },
-  { id: '6', name: 'Eva Green' },
-  { id: '7', name: 'Frank White' },
-  { id: '8', name: 'Grace Lee' },
-  { id: '9', name: 'Henry Ford' },
-  { id: '10', name: 'Ivy Chen' },
-  { id: '11', name: 'Jack Black' },
-  { id: '12', name: 'Kelly Clarkson' },
-  { id: '13', name: 'Liam Neeson' },
-  { id: '14', name: 'Mia Wallace' },
-  { id: '15', name: 'Nathan Drake' },
-]
+import { cn } from '@/lib/utils'
 
 export default function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const location = useLocation()
+  const dispatch = useAppDispatch()
+  const chats = useAppSelector(selectChats)
+  const loading = useAppSelector(selectChatsLoading)
+  const { id } = useParams()
+
+  useEffect(() => {
+    dispatch(fetchChats())    
+  }, [dispatch])
+
+  if (loading) {
+    return (
+      <div className="w-80 border-r p-4">
+        <p className="text-muted-foreground">Loading chats...</p>
+      </div>
+    )
+  }
 
   return (
-    <aside 
-      className={`border-r transition-all duration-300 flex flex-col h- ${
-        isCollapsed ? 'w-16' : 'w-64'
-      }`}
-    >
-      <div className="flex justify-between items-center p-[14px] border-b shrink-0 ">
-        {!isCollapsed && <h2 className="text-xl font-semibold">Chats</h2>}
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          {isCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </Button>
+    <div className="w-80 border-r">
+      <div className="p-4 border-b">
+        <h2 className="font-semibold">Chats</h2>
       </div>
-      <ScrollArea className="flex-grow">
+      <ScrollArea className="h-[calc(90vh-65px)]">
         <div className="p-2">
-          {chatList.map((chat) => (
-            <Button
+          {chats?.length>0 && chats.map((chat) => (
+            <Link
               key={chat.id}
-              variant={location.pathname === `/chats/${chat.id}` ? "secondary" : "ghost"}
-              className="w-full justify-start mb-1"
-              asChild
+              to={`/chats/${chat.id}`}
+              className={cn(
+                "block p-3 rounded-lg hover:bg-secondary transition-colors",
+                id === chat.id.toString() && "bg-secondary"
+              )}
             >
-              <Link to={`/chats/${chat.id}`}>
-                {isCollapsed ? chat.name[0] : chat.name}
-              </Link>
-            </Button>
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-medium">{chat.sender}</p>
+                  {chat.last_message && (
+                    <p className="text-sm text-muted-foreground truncate">
+                      {chat.last_message.content}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </Link>
           ))}
         </div>
       </ScrollArea>
-      <div className="p-4 border-t shrink-0">
-        <Button size="icon" className="w-full">
-          <Plus className="h-4 w-4" />
-        </Button>
-      </div>
-    </aside>
+    </div>
   )
 }
 

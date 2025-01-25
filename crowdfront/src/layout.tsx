@@ -21,11 +21,11 @@ function Layout() {
   return isAuthorized ? (
     <Navigate to="/dashboard" />
   ) : (
-    <div className="flex flex-col  w-full space-y-4">
+    <div className="flex flex-col min-h-screen">
       <div className="navbar">
         <h1>navbarout</h1>
       </div>
-      <div className=" w-full  min-h-screen ">
+      <div className="flex-grow">
         <Outlet />
         <Toaster />
       </div>
@@ -49,16 +49,15 @@ function ProtectedRoute() {
   return !isAuthorized ? (
     <Navigate to="/login" />
   ) : (
-    <div className=" flex flex-col  min-h-screen w-full">
+    <div className="flex flex-col min-h-screen">
       <div className="navbar">
-      <UserNavbar/>
-
+        <UserNavbar/>
       </div>
-      <div className=" pt-0 w-full">
+      <div className="flex-grow">
         <Outlet />
         <Toaster />
       </div>
-      <Footer/>
+      {/* <Footer/> */}
     </div>
   );
 }

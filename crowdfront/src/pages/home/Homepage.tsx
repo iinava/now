@@ -1,44 +1,39 @@
-import { useState } from "react";
-import { ProjectCard } from "@/components/home/ProjectCard";
-import { productIdeas } from "@/lib/constants";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { useEffect } from 'react';
+import { RootState, useAppDispatch, useAppSelector } from '../../store/store';
+import { fetchProjects } from '../../features/projectSlice';
+import ProjectCard from '../../components/home/ProjectCard';
 
 export default function HomePage() {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const dispatch = useAppDispatch();
+  const { projects, loading, error } = useAppSelector((state: RootState) => state.projects);
 
-  const filteredProducts = selectedCategory === "All"
-    ? productIdeas
-    : productIdeas.filter(product => product.category === selectedCategory);
+  useEffect(() => {
+    if(projects.length === 0){
+    dispatch(fetchProjects({}))
+  }
+  }, [dispatch]);
+  if (loading) {
+    return (
+      <div>
+        <h2>Loading projects...</h2>
+      </div>
+    );
+  }
 
-  const categories = ["All", "Home Automation", "Health & Wellness", "Software", "Fitness"];
+  if (error) {
+    return (
+      <div>
+        <h2>Error loading projects</h2>
+        <p>{error}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto py-4 px-4">
-      <h1 className="text-4xl font-bold mb-8 text-center">Product Ideas Showcase</h1>
-      
-      {/* Category Filter */}
-      <div className="text-center mb-8 md:w-72">
-        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="p-2 border rounded">
-            <SelectValue placeholder="Select Category" />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Product Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => (
-          <ProjectCard
-            key={product.id}
-            {...product}
-          />
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+        {projects && projects.map((project) => (
+          <ProjectCard key={project.id} project={project} />
         ))}
       </div>
     </div>

@@ -1,54 +1,83 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../lib/api";
 import { REFRESH_TOKEN, ACCESS_TOKEN } from "../lib/constants";
-import { jwtDecode } from "jwt-decode";
+import { LoginRequest, UserRegistrationRequest, UpdateProfileRequest, UserResponse } from "../lib/types";
+import API_ENDPOINTS from "../api/endpoints";
 
 // Define the types for the state
 interface AuthState {
   isAuthorized: boolean | null;
+  user: UserResponse | null;
+  loading: boolean;
+  error: string | null;
 }
 
-interface TokenResponse {
-  access: string;
-}
 
-// Define the async thunk for checking authentication
-export const checkAuth:any = createAsyncThunk<
-  { accessToken: string } | undefined, // Return type
-  void, // Argument type
-  { rejectValue: string } // Reject value type
->(
+// Login action
+export const login = createAsyncThunk(
+  "auth/login",
+  async (credentials: LoginRequest, thunkAPI) => {
+    try {
+      const response = await api.post(API_ENDPOINTS.auth.login, credentials);
+      localStorage.setItem(ACCESS_TOKEN, response.data.access);
+      localStorage.setItem(REFRESH_TOKEN, response.data.refresh);
+      return response.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || "Login failed");
+    }
+  }
+);
+
+// Register action
+export const register = createAsyncThunk(
+  "auth/register",
+  async (userData: UserRegistrationRequest, thunkAPI) => {
+    try {
+      const response = await api.post(API_ENDPOINTS.auth.register, userData);
+      return response.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || "Registration failed");
+    }
+  }
+);
+
+// Get profile action
+export const getProfile = createAsyncThunk(
+  "auth/getProfile",
+  async (_, thunkAPI) => {
+    try {
+      const response = await api.get<any>(API_ENDPOINTS.auth.profile);   
+      return response.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || "Failed to fetch profile");
+    }
+  }
+);
+
+// Update profile action
+export const updateProfile = createAsyncThunk(
+  "auth/updateProfile",
+  async (updateData: UpdateProfileRequest, thunkAPI) => {
+    try {
+      const response = await api.put<any>(API_ENDPOINTS.auth.update, updateData);
+      return response.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || "Failed to update profile");
+    }
+  }
+);
+
+// Check auth action
+export const checkAuth = createAsyncThunk(
   "auth/checkAuth",
   async (_, thunkAPI) => {
-    const accessToken = localStorage.getItem(ACCESS_TOKEN);
-    const refreshToken = localStorage.getItem(REFRESH_TOKEN);
-
-    if (!accessToken) {
-      return thunkAPI.rejectWithValue("No access token available");
+    const isLoggedIn = localStorage.getItem('IS_LOGGED_IN') === 'true';
+    
+    if (!isLoggedIn) {
+      return thunkAPI.rejectWithValue("Not logged in");
     }
 
-    try {
-      const decoded = jwtDecode<any>(accessToken); // Use `any` for decoding the JWT token
-      const tokenExpiration = decoded.exp;
-      const now = Date.now() / 1000;
-
-      if (tokenExpiration < now && refreshToken) {
-        const res = await api.post<TokenResponse>("/api/user/refresh/", { refresh: refreshToken });
-
-        if (res.status === 200) {
-          localStorage.setItem(ACCESS_TOKEN, res.data.access);
-          return { accessToken: res.data.access };
-        } else {
-          return thunkAPI.rejectWithValue("Unable to refresh token");
-        }
-      } else if (tokenExpiration >= now) {
-        return { accessToken };
-      } else {
-        return thunkAPI.rejectWithValue("Token expired and no refresh token available");
-      }
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
+    return { isLoggedIn };
   }
 );
 
@@ -57,33 +86,98 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     isAuthorized: null,
-  } as AuthState, // Type for the initial state
+    user: null,
+    loading: false,
+    error: null,
+  } as AuthState,
   reducers: {
     logout: (state) => {
       localStorage.removeItem(ACCESS_TOKEN);
       localStorage.removeItem(REFRESH_TOKEN);
+      localStorage.setItem('isLoggedIn', 'false');
       state.isAuthorized = false;
+      state.user = null;
+    },
+    clearError: (state) => {
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(checkAuth.pending, (state) => {
-      state.isAuthorized = null;
-    });
-    builder.addCase(checkAuth.fulfilled, (state, action: PayloadAction<{ accessToken: string } | undefined>) => {
-      if (action.payload) {
+    // Login
+    builder
+      .addCase(login.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(login.fulfilled, (state) => {
+        localStorage.setItem('isLoggedIn', 'true');
         state.isAuthorized = true;
-      } else {
+        state.loading = false;
+      })
+      .addCase(login.rejected, (state, action) => {
         state.isAuthorized = false;
-      }
-    });
-    builder.addCase(checkAuth.rejected, (state, action: PayloadAction<string>) => {
-      if (action.payload) {
-        console.log("Authentication failed:", action.payload); // Optionally log the error
-      }
-      state.isAuthorized = false;
-    });
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+    // Register
+    builder
+      .addCase(register.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+    // Get Profile
+    builder
+      .addCase(getProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getProfile.fulfilled, (state, action) => {
+        state.user = action.payload.data;
+        state.loading = false;
+      })
+      .addCase(getProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+    // Update Profile
+    builder
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.user = action.payload.data;
+        state.loading = false;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+    // Existing checkAuth cases...
+    builder
+      .addCase(checkAuth.pending, (state) => {
+        state.isAuthorized = null;
+      })
+      .addCase(checkAuth.fulfilled, (state) => {
+        state.isAuthorized = true;
+      })
+      .addCase(checkAuth.rejected, (state) => {
+        state.isAuthorized = false;
+      });
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, clearError } = authSlice.actions;
 export default authSlice.reducer;
+export const user = (state: any) => state.auth.user;

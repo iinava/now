@@ -1,27 +1,18 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom'; 
+import { Link, useLocation } from 'react-router-dom'; 
 import { User, Home, MessageCircle } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export function UserNavbar() {
   const { pathname } = useLocation(); 
 
   const navItems = [
     { href: '/', label: 'Home', icon: Home },
-    // { href: '/posts', label: 'Posts', icon: FileText },
     { href: '/chats', label: 'Chats', icon: MessageCircle },
+    { href: '/profile', label: 'Profile', icon: User },
   ];
 
-  const navigate = useNavigate(); 
-
   return (
-    <nav className="bg-transparent border-b border-gray-700">
-      <div className=" px-4">
+    <nav className="bg-transparent border-b border-gray-800 z-50">
+      <div className="px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
             <Link to="/" className="text-2xl font-bold text-white hover:text-blue-300 transition-colors">
@@ -41,24 +32,6 @@ export function UserNavbar() {
                 <span className="hidden sm:inline">{item.label}</span> 
               </Link>
             ))}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-white hover:text-blue-300">
-                  <User className="h-5 w-5" />
-                  <span className="sr-only">User menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem  onClick={() => navigate("/profile")}>
-                  <Link to="/profile" className="w-full">Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <button onClick={() => console.log('Logout clicked')} className="w-full text-left">
-                    Logout
-                  </button>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
       </div>

@@ -2,12 +2,13 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import {Layout,ProtectedRoute} from "./layout";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import HomePage from "./pages/home/Homepage";
 import Chat from "./components/Chat/Chat";
 import ChatPage from "./pages/Chats/ChatPage";
 import ChatLayout from "./pages/Chats/ChatLayout";
 import Profilepage from "./pages/Profile/Profilepage";
 import ProjectIdeaPage from "./pages/home/ProjectDetails";
+import HomePage from "./pages/home/Homepage";
+
 
 
 function App() {
@@ -57,7 +58,7 @@ function App() {
           ],
         },
         {
-          path:"projects/:slug",
+          path:"projects/:id",
           element: <ProjectIdeaPage/>
         },
         {

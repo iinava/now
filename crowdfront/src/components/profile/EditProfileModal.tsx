@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -9,97 +10,147 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { getProfile, updateProfile } from '@/features/authSlice'
+import { RootState, AppDispatch } from '@/store'
+import { UpdateProfileRequest } from '@/lib/types'
+import { useToast } from '@/hooks/use-toast'
 
 export function EditProfileButton() {
-  const [open, setOpen] = useState(false)
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+  const dispatch = useDispatch<AppDispatch>();
+  const { toast } = useToast();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const loading = useSelector((state: RootState) => state.auth.loading);
+  const [open, setOpen] = useState(false);
+  
+  const [formData, setFormData] = useState<UpdateProfileRequest>({
+    username: '',
     email: '',
-    phone: '',
-  })
+    phone_number: '',
+    full_name: '',
+  });
+
+  // Add console.log to debug
+  useEffect(() => {
+    if(user){return}
+    const fetchProfile = async () => {
+      try {
+        console.log('Attempting to fetch profile...');
+        const result = await dispatch(getProfile()).unwrap();
+        console.log('Profile fetch success:', result);
+      } catch (error) {
+        console.error('Profile fetch failed:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load profile",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchProfile();
+  }, []); // Keep only empty dependency array
+
+  // Separate effect to update form data when user data is available
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        username: user.username,
+        email: user.email,
+        phone_number: user.phone_number,
+        full_name: user.full_name,
+      });
+    }
+  }, [user,open]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData(prevData => ({
       ...prevData,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Form submitted:', formData)
-    // Here you would typically send the data to your backend
-    setOpen(false)
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await dispatch(updateProfile(formData)).unwrap();
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+      setOpen(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
-    <div className="dark">
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button className="flex items-center justify-center shadow-lg">
-            Edit Profile
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="flex items-center justify-center shadow-lg">
+          Edit Profile
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-black text-white">
+        <DialogHeader>
+          <DialogTitle>Edit Profile</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="username">Username</Label>
+            <Input 
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="full_name">Full Name</Label>
+            <Input 
+              id="full_name"
+              name="full_name"
+              value={formData.full_name}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input 
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="phone_number">Phone Number</Label>
+            <Input 
+              id="phone_number"
+              name="phone_number"
+              value={formData.phone_number}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <Button 
+            type="submit" 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={loading}
+          >
+            {loading ? "Saving..." : "Save Changes"}
           </Button>
-        </DialogTrigger>
-        <DialogContent className="bg-black text-white">
-          <DialogHeader>
-            <DialogTitle>Edit Profile</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="firstName">First Name</Label>
-              <Input 
-                id="firstName" 
-                name="firstName" 
-                placeholder="Enter first name" 
-                value={formData.firstName} 
-                onChange={handleInputChange} 
-                required 
-              />
-            </div>
-            <div>
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input 
-                id="lastName" 
-                name="lastName" 
-                placeholder="Enter last name" 
-                value={formData.lastName} 
-                onChange={handleInputChange} 
-                required 
-              />
-            </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                name="email" 
-                type="email" 
-                placeholder="Enter email" 
-                value={formData.email} 
-                onChange={handleInputChange} 
-                required 
-              />
-            </div>
-            <div>
-              <Label htmlFor="phone">Phone</Label>
-              <Input 
-                id="phone" 
-                name="phone" 
-                type="tel" 
-                placeholder="Enter phone number" 
-                value={formData.phone} 
-                onChange={handleInputChange} 
-                required 
-              />
-            </div>
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-              Save Changes
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </div>
-  )
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 }
 

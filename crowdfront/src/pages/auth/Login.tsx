@@ -1,9 +1,9 @@
 import AuthForm from "@/components/auth/AuthForm";
+import API_ENDPOINTS from "@/api/endpoints";
 
 function Login() {
   return (
     <div>
-      
       <section className="">
         <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
           <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
@@ -71,7 +71,7 @@ function Login() {
                 </p>
               </div>
       
-              <AuthForm route="/api/user/token/" method="login" />
+              <AuthForm route={API_ENDPOINTS.auth.login} method="login" />
             </div>
           </main>
         </div>

@@ -1,4 +1,5 @@
 import AuthForm from "@/components/auth/AuthForm"
+import API_ENDPOINTS from "@/api/endpoints"
 
 function Register() {
     return  <div>
@@ -71,7 +72,7 @@ function Register() {
               </p>
             </div>
     
-            <AuthForm route="/api/user/register/" method="register" />
+            <AuthForm route={API_ENDPOINTS.auth.register} method="register" />
           </div>
         </main>
       </div>

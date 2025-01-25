@@ -4,14 +4,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import { useAppDispatch } from '@/store/store'
+import { createProject } from '@/features/projectSlice';
+import { useToast } from "@/hooks/use-toast"
+import { CreateProjectRequest } from '@/lib/project_types';
 
 const PostModal = () => {
-  const [formData, setFormData] = useState({
+  const dispatch = useAppDispatch();
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
+  
+  const [formData, setFormData] = useState<CreateProjectRequest>({
     title: '',
     description: '',
-    summary: '',
-    image: null as File | null,
-    category: ''
+    detailed_description: '',
+    image: undefined
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -19,32 +28,53 @@ const PostModal = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleQuillChange = (value: string) => {
+    setFormData({ ...formData, detailed_description: value });
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
+    const file = e.target.files?.[0];
     setFormData({ ...formData, image: file });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form Submitted:', formData);
+    
+    try {
+      const result = await dispatch(createProject(formData)).unwrap();
+      toast({
+        title: "Success",
+        description: "Project created successfully!",
+      });
+      setOpen(false);
+      setFormData({
+        title: '',
+        description: '',
+        detailed_description: '',
+        image: undefined
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create project. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
-    <Dialog>
-      {/* Round Button */}
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="  flex items-center justify-center  hover:bg-blue-100 text-black  shadow-lg">
+        <Button className="flex items-center justify-center hover:bg-blue-100 text-black shadow-lg">
           Post
         </Button>
       </DialogTrigger>
       
-      {/* Modal Content */}
-      <DialogContent>
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Create a New Post</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Title Field */}
           <div>
             <Label htmlFor="title">Title</Label>
             <Input 
@@ -57,7 +87,6 @@ const PostModal = () => {
             />
           </div>
           
-          {/* Description Field */}
           <div>
             <Label htmlFor="description">Description</Label>
             <Textarea 
@@ -70,20 +99,18 @@ const PostModal = () => {
             />
           </div>
 
-          {/* Summary Field */}
           <div>
-            <Label htmlFor="summary">Summary</Label>
-            <Textarea 
-              id="summary" 
-              name="summary" 
-              placeholder="Enter a brief summary" 
-              value={formData.summary} 
-              onChange={handleInputChange} 
-              required 
-            />
+            <Label htmlFor="detailed_description">Detailed Description</Label>
+            <div className="min-h-[200px]">
+              <ReactQuill
+                theme="snow"
+                value={formData.detailed_description}
+                onChange={handleQuillChange}
+                className="h-[150px] mb-12"
+              />
+            </div>
           </div>
 
-          {/* Image Picker */}
           <div>
             <Label htmlFor="image">Image</Label>
             <Input 
@@ -95,20 +122,10 @@ const PostModal = () => {
             />
           </div>
 
-          {/* Category Field */}
-          <div>
-            <Label htmlFor="category">Category</Label>
-            <Input 
-              id="category" 
-              name="category" 
-              placeholder="Enter category" 
-              value={formData.category} 
-              onChange={handleInputChange} 
-            />
-          </div>
-
-          {/* Submit Button */}
-          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+          <Button 
+            type="submit" 
+            className="w-full bg-blue-600 hover:bg-blue-700"
+          >
             Post Now
           </Button>
         </form>
