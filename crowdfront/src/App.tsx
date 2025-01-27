@@ -8,6 +8,7 @@ import ChatLayout from "./pages/Chats/ChatLayout";
 import Profilepage from "./pages/Profile/Profilepage";
 import ProjectIdeaPage from "./pages/home/ProjectDetails";
 import HomePage from "./pages/home/Homepage";
+import LandingPage from "./pages/LandingPage";
 
 
 
@@ -19,7 +20,7 @@ function App() {
       children: [
         {
           path: "",
-          element: <h1>hi</h1>
+          element: <LandingPage />
         },
         {
           path: "login",

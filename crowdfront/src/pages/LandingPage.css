@@ -1,0 +1,12 @@
+.landing-page {
+  background-color: #121212; /* Dark background */
+  color: #ffffff; /* Light text */
+  text-align: center;
+  padding: 20px;
+}
+
+.landing-page img {
+  max-width: 100%;
+  height: auto;
+  margin: 10px 0;
+} 

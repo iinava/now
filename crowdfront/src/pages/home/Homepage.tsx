@@ -1,17 +1,20 @@
 import { useEffect } from 'react';
-import { RootState, useAppDispatch, useAppSelector } from '../../store/store';
-import { fetchProjects } from '../../features/projectSlice';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { fetchProjects, selectProjects, selectProjectsLoading, selectProjectsError } from '../../features/projectSlice';
 import ProjectCard from '../../components/home/ProjectCard';
 
 export default function HomePage() {
   const dispatch = useAppDispatch();
-  const { projects, loading, error } = useAppSelector((state: RootState) => state.projects);
+  const projects = useAppSelector(selectProjects);
+  const loading = useAppSelector(selectProjectsLoading);
+  const error = useAppSelector(selectProjectsError);
 
   useEffect(() => {
-    if(projects.length === 0){
-    dispatch(fetchProjects({}))
-  }
-  }, [dispatch]);
+    if (projects.length === 0) {
+      dispatch(fetchProjects({}));
+    }
+  }, [dispatch, projects.length]);
+
   if (loading) {
     return (
       <div>
@@ -32,9 +35,15 @@ export default function HomePage() {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-        {projects && projects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
-        ))}
+        {projects.length === 0 ? (
+          <div className='text-center'>
+            <h2>No projects found</h2>
+          </div>
+        ) : (
+          projects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))
+        )}
       </div>
     </div>
   );

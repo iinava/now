@@ -8,7 +8,6 @@ import {
   CreateMessageRequest,
   GetChatsListResponse,
   GetMessagesResponse,
-  ErrorResponse,
 } from '../lib/chat_message_types';
 import { RootState } from '../store/store';
 

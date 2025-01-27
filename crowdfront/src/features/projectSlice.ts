@@ -28,6 +28,7 @@ interface ProjectState {
     next: string | null;
     previous: string | null;
   };
+  lookingForOptions: any[];
 }
 
 const initialState: ProjectState = {
@@ -46,6 +47,7 @@ const initialState: ProjectState = {
     next: null,
     previous: null,
   },
+  lookingForOptions: [],
 };
 
 // Add this interface for pagination parameters
@@ -114,7 +116,7 @@ export const createProject = createAsyncThunk(
       const response = await api.post<CreateProjectResponse>(API_ENDPOINTS.projects.create, formData);
       return response.data.data;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response?.data?.error || "Failed to create project");
+      return thunkAPI.rejectWithValue(error.response.data || "Failed to create project");
     }
   }
 );
@@ -146,6 +148,22 @@ export const deleteProject = createAsyncThunk(
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data || "Failed to delete project");
     }
+  }
+);
+
+// New action to fetch looking for options
+export const fetchLookingForOptions = createAsyncThunk(
+  'projects/fetchLookingForOptions',
+  async (query: string) => {
+    console.log("Fetching options for query:", query);
+    const response = await api.get(`${API_ENDPOINTS.positions.search}?q=${query}`);
+    
+    if (!response || !response.data) {
+      throw new Error('Failed to fetch looking for options');
+    }
+    
+    console.log("Response data:", response.data);
+    return response.data.data;
   }
 );
 
@@ -258,16 +276,26 @@ const projectSlice = createSlice({
       .addCase(deleteProject.rejected, (state, action) => {
         state.actionLoading.delete = false;
         state.error = action.payload as string;
+      })
+      // Fetch looking for options
+      .addCase(fetchLookingForOptions.fulfilled, (state, action) => {
+        console.log("Fetched looking for options:", action.payload);
+        state.lookingForOptions = action.payload.data;
       });
   },
 });
 
+// Export actions
 export const { clearCurrentProject, clearError } = projectSlice.actions;
+
+// Export reducer
 export default projectSlice.reducer;
 
-// Add these selectors at the bottom of projectSlice.ts
+// Export selectors
 export const selectPaginationInfo = (state: RootState) => state.projects.pagination;
 export const selectProjects = (state: RootState) => state.projects.projects;
 export const selectProjectsLoading = (state: RootState) => state.projects.loading; 
 export const selectOwnProjects = (state: RootState) => state.projects.ownprojects;
 export const selectOwnProjectsLoading = (state: RootState) => state.projects.loading;
+export const selectCurrentProject = (state: RootState) => state.projects.currentProject;
+export const selectProjectsError = (state: RootState) => state.projects.error;

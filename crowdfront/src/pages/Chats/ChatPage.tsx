@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { selectCurrentUser } from "@/features/authSlice"
 
 const MessageContent = ({ content }: { content: any }) => {
   if (typeof content === 'object' && content !== null) {
@@ -21,11 +22,7 @@ const MessageContent = ({ content }: { content: any }) => {
   return <p>{content}</p>;
 };
 
-// Add this new function to determine if message is from the current user
-const isCurrentUserMessage = (message: any) => {
-  // You can adjust this logic based on how you identify the current user
-  return message.sender === 'tester' || message.isCurrentUser;
-}
+
 
 export default function ChatPage() {
   const { id } = useParams()
@@ -33,6 +30,13 @@ export default function ChatPage() {
   const messages = useAppSelector(selectMessages)
   const loading = useAppSelector(selectMessagesLoading)
   const error = useAppSelector(selectChatError)
+  const user = useAppSelector(selectCurrentUser)
+
+  // Add this new function to determine if message is from the current user
+const isCurrentUserMessage = (message: any) => {
+  // You can adjust this logic based on how you identify the current user
+  return message.sender === user?.username || message.isCurrentUser;
+}
   
   const [input, setInput] = useState('')
   const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -79,12 +83,12 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
-      <header className="flex justify-between items-center p-4 border-b">
+    <div className="flex-1 flex flex-col h-screen max-h-screen overflow-hidden">
+      <header className="flex justify-between items-center p-4 border-b shrink-0">
         <h1 className="text-2xl font-bold">Chat</h1>
       </header>
-      <ScrollArea className="flex-1">
-        <div className="p-4" ref={scrollAreaRef}>
+      <ScrollArea className="flex-1 h-[calc(100vh-8rem)]" ref={scrollAreaRef}>
+        <div className="p-4">
           <div className="space-y-4 flex flex-col">
             {messages?.length > 0 && [...messages].reverse().map((message) => (
               <div
@@ -106,7 +110,7 @@ export default function ChatPage() {
           </div>
         </div>
       </ScrollArea>
-      <div className="p-4 border-t">
+      <div className="p-4 border-t shrink-0">
         <div className="flex gap-2">
           <Input
             value={input}

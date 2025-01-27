@@ -4,7 +4,6 @@ import { checkAuth } from "./features/authSlice.ts";
 import { useEffect } from "react";
 import { UserNavbar } from "./components/Navbars/UserNavbar.tsx";
 import { Toaster } from "./components/ui/toaster.tsx";
-import Footer from "./components/Footer.tsx";
 
 function Layout() {
   const dispatch = useDispatch();
@@ -23,7 +22,6 @@ function Layout() {
   ) : (
     <div className="flex flex-col min-h-screen">
       <div className="navbar">
-        <h1>navbarout</h1>
       </div>
       <div className="flex-grow">
         <Outlet />
@@ -49,15 +47,24 @@ function ProtectedRoute() {
   return !isAuthorized ? (
     <Navigate to="/login" />
   ) : (
-    <div className="flex flex-col min-h-screen">
-      <div className="navbar">
-        <UserNavbar/>
+    <div className="flex min-h-screen bg-black">
+      {/* Left Sidebar - hidden on mobile, visible on md+ screens */}
+      <div className="hidden md:block w-64 border-r border-gray-800 fixed h-full">
+        <UserNavbar variant="sidebar" />
       </div>
-      <div className="flex-grow">
-        <Outlet />
-        <Toaster />
+      
+      {/* Top Navbar - visible on mobile, hidden on md+ screens */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 border-b border-gray-800">
+        <UserNavbar variant="topbar" />
       </div>
-      {/* <Footer/> */}
+      
+      {/* Main Content */}
+      <div className="flex-1 md:ml-64 w-full">
+        <div className="flex-grow mt-16 md:mt-0">
+          <Outlet />
+          <Toaster />
+        </div>
+      </div>
     </div>
   );
 }
