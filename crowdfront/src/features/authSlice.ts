@@ -3,6 +3,7 @@ import api from "../lib/api";
 import { REFRESH_TOKEN, ACCESS_TOKEN } from "../lib/constants";
 import { LoginRequest, UserRegistrationRequest, UpdateProfileRequest, UserResponse } from "../lib/types";
 import API_ENDPOINTS from "../api/endpoints";
+import { RootState } from "../store";
 
 // Define the types for the state
 interface AuthState {
@@ -181,3 +182,8 @@ const authSlice = createSlice({
 export const { logout, clearError } = authSlice.actions;
 export default authSlice.reducer;
 export const user = (state: any) => state.auth.user;
+
+// Add selectors for authentication
+export const selectCurrentUser = (state: RootState) => state.auth.user;
+export const selectAuthLoading = (state: RootState) => state.auth.loading; 
+export const selectAuthError = (state: RootState) => state.auth.error; 

@@ -2,12 +2,12 @@
 import ProjectCard from "@/components/home/ProjectCard";
 import { EditProfileButton } from "@/components/profile/EditProfileModal";
 import PostModal from "@/components/profile/PostModal";
-import { User, LogOut } from "lucide-react";
+import {LogOut } from "lucide-react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import { fetchOwnProjects, selectOwnProjects, selectOwnProjectsLoading } from "@/features/projectSlice";
-import { getProfile } from "@/features/authSlice";
+import { selectCurrentUser } from "@/features/authSlice";
 import { Button } from "@/components/ui/button";
 import ConfirmationAlert from "@/components/ui/ConfirmationAlert";
 import { useNavigate } from "react-router-dom";
@@ -17,18 +17,18 @@ export default function Profilepage() {
   const navigate = useNavigate();
   const ownProjects = useAppSelector(selectOwnProjects);
   const isLoading = useAppSelector(selectOwnProjectsLoading);
-  const user = useAppSelector((state) => state.auth.user);
+  const user = useAppSelector(selectCurrentUser);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchOwnProjects({}));
-    dispatch(getProfile());
   }, [dispatch]);
 
   const handleLogout = () => {
     // Implement your logout logic here
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
+    localStorage.removeItem('isLoggedIn');
     navigate('/login');
     window.location.reload(); // Force reload to clear all state
   };
@@ -36,8 +36,8 @@ export default function Profilepage() {
 
   return (
     <div className="w-full flex flex-col items-center pt-20 px-4">
-      <div className="w-32 h-32 bg-gray-700 rounded-full flex items-center justify-center mb-4">
-        <User className="w-20 h-20 text-gray-400" />
+      <div className="w-32 h-32 bg-orange-500 rounded-full flex items-center justify-center mb-4">
+        {/* <User className="w-20 h-20 text-gray-400" /> */}
       </div>
       <h1 className="text-xl font-semibold">{user?.username || 'Loading...'}</h1>
       <p className="text-gray-600 mt-2">{user?.email}</p>

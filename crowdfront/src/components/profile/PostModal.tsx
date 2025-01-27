@@ -10,11 +10,13 @@ import { useAppDispatch } from '@/store/store'
 import { createProject } from '@/features/projectSlice';
 import { useToast } from "@/hooks/use-toast"
 import { CreateProjectRequest } from '@/lib/project_types';
+import PositionMultiSelect from '../PositionMultiSelect';
 
 const PostModal = () => {
   const dispatch = useAppDispatch();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
+  const [selectedPositions, setSelectedPositions] = useState<number[]>([]);
   
   const [formData, setFormData] = useState<CreateProjectRequest>({
     title: '',
@@ -39,13 +41,16 @@ const PostModal = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    try {
-      const result = await dispatch(createProject(formData)).unwrap();
-      toast({
-        title: "Success",
-        description: "Project created successfully!",
-      });
+    const payload = {
+      ...formData,
+      looking_for: selectedPositions,
+    };
+  
+       await dispatch(createProject(payload)).unwrap().then(()=>{
+        toast({
+          title: "Success",
+          description: "Project created successfully!",
+        })
       setOpen(false);
       setFormData({
         title: '',
@@ -53,14 +58,17 @@ const PostModal = () => {
         detailed_description: '',
         image: undefined
       });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create project. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
+
+      }).catch((error)=>{
+        console.log(error)
+        toast({
+          title: "Error",
+          description: error.message ? error.message : "Failed to create project. Please try again.",
+          variant: "destructive",
+        })
+      })
+
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -121,6 +129,10 @@ const PostModal = () => {
               onChange={handleFileChange} 
             />
           </div>
+          <div>
+        <Label htmlFor="positions">Positions</Label>
+        <PositionMultiSelect onChange={setSelectedPositions} />
+      </div>
 
           <Button 
             type="submit" 

@@ -15,6 +15,9 @@ const API_ENDPOINTS = {
     update: (id: string | number) => `/api/projects/${id}/update/`,
     delete: (id: string | number) => `/api/projects/${id}/delete/`,
   },
+  positions: {
+    search: '/api/projects/positions/search',
+  },
   chats: {
     list: '/api/chats/',
     create: '/api/chats/create/',

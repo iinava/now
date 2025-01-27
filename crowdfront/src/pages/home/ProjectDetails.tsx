@@ -1,23 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { fetchProjectById, deleteProject } from '../../features/projectSlice';
+import { fetchProjectById, deleteProject, selectCurrentProject, selectProjectsLoading, selectProjectsError } from '../../features/projectSlice';
+import { selectCurrentUser } from '../../features/authSlice';
 import ProjectDescription from '@/components/home/ProjectDescription';
 import AuthorInfo from '@/components/home/AuthorsInfo';
 import Banner from '@/components/home/Banner';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
-import { getProfile } from '@/features/authSlice';
 import EditProjectModal from '@/components/home/EditProjectModal';
 import DeleteProjectAlert from '@/components/home/DeleteProjectAlert';
 
 export default function ProjectDetails() {
-  const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
-  const loading = useAppSelector((state) => state.projects.loading);
-  const error = useAppSelector((state) => state.projects.error);
-  const project = useAppSelector((state) => state.projects.currentProject);
-  const currentUser = useAppSelector((state) => state.auth.user);
+  const { id } = useParams<{ id: string }>();
+  const loading = useAppSelector(selectProjectsLoading);
+  const error = useAppSelector(selectProjectsError);
+  const project = useAppSelector(selectCurrentProject);
+  const currentUser = useAppSelector(selectCurrentUser);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const navigate = useNavigate();
@@ -28,10 +28,10 @@ export default function ProjectDetails() {
     }
   }, [dispatch, id]);
   
-  if(!currentUser){ 
-    dispatch(getProfile());
+  if (!currentUser) { 
+    // Handle case where currentUser is not available
   }
-  const isOwner = currentUser?.id === project?.owner_id;
+  const isOwner = project ? currentUser?.id === project.owner_id : false;
 
   const handleEdit = () => {
     setIsEditModalOpen(true);
@@ -60,35 +60,53 @@ export default function ProjectDetails() {
   }
 
   return (
-    <div className="min-h-screen text-gray-100 mb-10">
-      <Banner image_url={project.image_url} title={project.title} />
-      <div className="px-4">
-        <div >
-          <AuthorInfo author={project.owner} authorId={project.owner_id}/>
+    <div className="min-h-screen text-gray-100">
+      <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        {/* Title and Author Section */}
+        <div className="mb-6">
+          <h1 className="text-4xl font-bold mb-4">{project.title}</h1>
+          <AuthorInfo author={project.owner} authorId={project.owner_id} isOwner={isOwner} />
         </div>
+
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-2">
+            {project.looking_for.length > 0 ? <h2 className="text-1xl font-bold mb-4">Looking For 👀</h2> : null}
+            {project.looking_for ? project.looking_for.map((item, index) => (
+              <div key={index} className="">{item.position}</div>
+            )) : null}
+          </div>
+        </div>
+
+        {/* Banner Section */}
+        <Banner image_url={project.image_url} title={project.title} />
+
+        {/* Owner Actions */}
         {isOwner && (
-            <div className="flex gap-2 mt-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleEdit}
-              >
-                <Pencil className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
-              <Button 
-                variant="destructive" 
-                size="sm"
-                onClick={() => setIsDeleteDialogOpen(true)}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete
-              </Button>
-            </div>
-          )}
+          <div className="flex gap-2 mt-6">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleEdit}
+            >
+              <Pencil className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={() => setIsDeleteDialogOpen(true)}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete
+            </Button>
+          </div>
+        )}
+
+        {/* Description Section */}
         <ProjectDescription desc={project.description} detailed_desc={project.detailed_description} />
       </div>
-      
+
+      {/* Modals */}
       {project && (
         <EditProjectModal
           project={project}

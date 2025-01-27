@@ -26,7 +26,7 @@ export interface PaginatedResponse<T> {
   export interface GetChatsListResponse {
     status: boolean;
     code: string;
-    data: Chat[];
+    data: PaginatedResponse<Chat>;
     message: string;
   }
   
@@ -47,7 +47,7 @@ export interface PaginatedResponse<T> {
   // GET /chat/{chat_id}/messages/
   export interface GetMessagesResponse {
     status: string;
-    data: Message[];
+    data: GetMessagesPaginatedResponse;
     error: null | string;
   }
   
