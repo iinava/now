@@ -51,7 +51,7 @@ const PostModal = () => {
           title: "Success",
           description: "Project created successfully!",
         })
-      setOpen(false);
+      // setOpen(false);
       setFormData({
         title: '',
         description: '',
