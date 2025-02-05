@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,13 +10,14 @@ import { useAppDispatch } from '@/store/store'
 import { createProject } from '@/features/projectSlice';
 import { useToast } from "@/hooks/use-toast"
 import { CreateProjectRequest } from '@/lib/project_types';
-import PositionMultiSelect from '../PositionMultiSelect';
+import { MultiselectDropdown } from '../MultiselectDropdown';
+
 
 const PostModal = () => {
   const dispatch = useAppDispatch();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  const [selectedPositions, setSelectedPositions] = useState<number[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<{ value: string; label: string }[]>([]);
   
   const [formData, setFormData] = useState<CreateProjectRequest>({
     title: '',
@@ -24,6 +25,23 @@ const PostModal = () => {
     detailed_description: '',
     image: undefined
   });
+
+  const initialOptions = [
+    { value: "1", label: "Apple" },
+    { value: "2", label: "Banana" },
+    { value: "3", label: "Cherry" },
+    { value: "4", label: "Date" },
+    { value: "5", label: "Elderberry" },
+  ]
+
+  const [numericValues, setNumericValues] = useState<number[]>([]);
+
+  useEffect(() => {
+    const values = selectedOptions.map(option => parseInt(option.value));
+    setNumericValues(values);
+    console.log(selectedOptions,numericValues);
+    
+  }, [selectedOptions]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -41,16 +59,22 @@ const PostModal = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Convert selectedOptions to numeric values
+    const numericValues = selectedOptions.map(option => option.value);
+
     const payload = {
       ...formData,
-      looking_for: selectedPositions,
+      looking_for: numericValues,
     };
-  
-       await dispatch(createProject(payload)).unwrap().then(()=>{
-        toast({
-          title: "Success",
-          description: "Project created successfully!",
-        })
+
+    console.log("Payload:", payload); // Log the payload to check values
+
+    await dispatch(createProject(payload)).unwrap().then(() => {
+      toast({
+        title: "Success",
+        description: "Project created successfully!",
+      });
       // setOpen(false);
       setFormData({
         title: '',
@@ -58,17 +82,16 @@ const PostModal = () => {
         detailed_description: '',
         image: undefined
       });
-
-      }).catch((error)=>{
-        console.log(error)
-        toast({
-          title: "Error",
-          description: error.message ? error.message : "Failed to create project. Please try again.",
-          variant: "destructive",
-        })
-      })
-
-  }
+      setSelectedOptions([]); // Reset selected options
+    }).catch((error) => {
+      console.log(error);
+      toast({
+        title: "Error",
+        description: error.message ? error.message : "Failed to create project. Please try again.",
+        variant: "destructive",
+      });
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -131,7 +154,10 @@ const PostModal = () => {
           </div>
           <div>
         <Label htmlFor="positions">Positions</Label>
-        <PositionMultiSelect onChange={setSelectedPositions} />
+        <MultiselectDropdown 
+          options={initialOptions} 
+          onChange={setSelectedOptions}
+        />
       </div>
 
           <Button 

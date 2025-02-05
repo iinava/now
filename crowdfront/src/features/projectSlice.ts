@@ -107,13 +107,13 @@ export const createProject = createAsyncThunk(
   'projects/createProject',
   async (data: CreateProjectRequest, thunkAPI) => {
     try {
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) {
-          formData.append(key, value);
-        }
-      });
-      const response = await api.post<CreateProjectResponse>(API_ENDPOINTS.projects.create, formData);
+      // const formData = new FormData();
+      // Object.entries(data).forEach(([key, value]) => {
+      //   if (value !== undefined) {
+      //     formData.append(key, value);
+      //   }
+      // });
+      const response = await api.post<CreateProjectResponse>(API_ENDPOINTS.projects.create, data);
       return response.data.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response.data || "Failed to create project");
@@ -163,7 +163,11 @@ export const fetchLookingForOptions = createAsyncThunk(
     }
     
     console.log("Response data:", response.data);
-    return response.data.data;
+    // Map the response to the expected format
+    return response.data.data.map((item: { id: number; position: string }) => ({
+      value: item.id.toString(), // Ensure value is a string
+      label: item.position,
+    })) || [];
   }
 );
 
@@ -280,7 +284,7 @@ const projectSlice = createSlice({
       // Fetch looking for options
       .addCase(fetchLookingForOptions.fulfilled, (state, action) => {
         console.log("Fetched looking for options:", action.payload);
-        state.lookingForOptions = action.payload.data;
+        state.lookingForOptions = action.payload;
       });
   },
 });
