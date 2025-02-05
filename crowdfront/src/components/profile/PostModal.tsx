@@ -23,7 +23,7 @@ const PostModal = () => {
     title: '',
     description: '',
     detailed_description: '',
-    image: undefined
+    image: null
   });
 
   const initialOptions = [
@@ -53,43 +53,51 @@ const PostModal = () => {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0] || null;
     setFormData({ ...formData, image: file });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Convert selectedOptions to numeric values
-    const numericValues = selectedOptions.map(option => option.value);
+    // Create a FormData object
+    const formDataToSend = new FormData();
+    
+    // Append form data
+    formDataToSend.append('title', formData.title);
+    formDataToSend.append('description', formData.description);
+    formDataToSend.append('detailed_description', formData.detailed_description);
+    if (formData.image) {
+        formDataToSend.append('image', formData.image); // Append the image file
+    }
+    
+    // Convert selectedOptions to numeric values and append each as a separate entry
+    const numericValues = selectedOptions.map(option => option.value); // Keep as strings
+    numericValues.forEach(value => {
+        formDataToSend.append('looking_for', value); // Append each value as a separate entry
+    });
 
-    const payload = {
-      ...formData,
-      looking_for: numericValues,
-    };
+    console.log("Payload:", formDataToSend); // Log the payload to check values
 
-    console.log("Payload:", payload); // Log the payload to check values
-
-    await dispatch(createProject(payload)).unwrap().then(() => {
-      toast({
-        title: "Success",
-        description: "Project created successfully!",
-      });
-      // setOpen(false);
-      setFormData({
-        title: '',
-        description: '',
-        detailed_description: '',
-        image: undefined
-      });
-      setSelectedOptions([]); // Reset selected options
+    await dispatch(createProject(formDataToSend)).unwrap().then(() => {
+        toast({
+            title: "Success",
+            description: "Project created successfully!",
+        });
+        setFormData({
+            title: '',
+            description: '',
+            detailed_description: '',
+            image: null
+        });
+        setSelectedOptions([]); // Reset selected options
     }).catch((error) => {
-      console.log(error);
-      toast({
-        title: "Error",
-        description: error.message ? error.message : "Failed to create project. Please try again.",
-        variant: "destructive",
-      });
+        console.log(error);
+        toast({
+            title: "Error",
+            description: error.message ? error.message : "Failed to create project. Please try again.",
+            variant: "destructive",
+        });
     });
   };
 

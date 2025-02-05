@@ -2,7 +2,7 @@ import  { useRef, useEffect } from "react"
 import { useMultiselectDropdown, type Option } from "../hooks/use-multiselect-dropdown"
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchLookingForOptions } from '../features/projectSlice';
-import { RootState } from '../store/store';
+import { RootState, AppDispatch } from '../store/store';
 
 interface MultiselectDropdownProps {
   options: Option[]
@@ -11,7 +11,7 @@ interface MultiselectDropdownProps {
 }
 
 export function MultiselectDropdown({ options, placeholder = "Select items...", onChange }: MultiselectDropdownProps) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const lookingForOptions = useSelector((state: RootState) => state.projects.lookingForOptions);
 
   const { selectedOptions, searchTerm, setSearchTerm, isOpen, setIsOpen, toggleOption } =
