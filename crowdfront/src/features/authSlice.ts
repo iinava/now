@@ -45,12 +45,18 @@ export const register = createAsyncThunk(
 // Get profile action
 export const getProfile = createAsyncThunk(
   "auth/getProfile",
-  async (_, thunkAPI) => {
+  async (_, { getState, rejectWithValue }) => {
+    const state = getState() as RootState;
+    // Check if user data is already available
+    if (state.auth.user) {
+      return state.auth.user; // Return cached user data
+    }
+    
     try {
       const response = await api.get<any>(API_ENDPOINTS.auth.profile);   
       return response.data;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response?.data || "Failed to fetch profile");
+      return rejectWithValue(error.response?.data || "Failed to fetch profile");
     }
   }
 );
