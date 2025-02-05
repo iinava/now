@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,20 +10,38 @@ import { useAppDispatch } from '@/store/store'
 import { createProject } from '@/features/projectSlice';
 import { useToast } from "@/hooks/use-toast"
 import { CreateProjectRequest } from '@/lib/project_types';
-import PositionMultiSelect from '../PositionMultiSelect';
+import { MultiselectDropdown } from '../MultiselectDropdown';
+
 
 const PostModal = () => {
   const dispatch = useAppDispatch();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  const [selectedPositions, setSelectedPositions] = useState<number[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<{ value: string; label: string }[]>([]);
   
   const [formData, setFormData] = useState<CreateProjectRequest>({
     title: '',
     description: '',
     detailed_description: '',
-    image: undefined
+    image: null
   });
+
+  const initialOptions = [
+    { value: "1", label: "Apple" },
+    { value: "2", label: "Banana" },
+    { value: "3", label: "Cherry" },
+    { value: "4", label: "Date" },
+    { value: "5", label: "Elderberry" },
+  ]
+
+  const [numericValues, setNumericValues] = useState<number[]>([]);
+
+  useEffect(() => {
+    const values = selectedOptions.map(option => parseInt(option.value));
+    setNumericValues(values);
+    console.log(selectedOptions,numericValues);
+    
+  }, [selectedOptions]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -35,40 +53,53 @@ const PostModal = () => {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0] || null;
     setFormData({ ...formData, image: file });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = {
-      ...formData,
-      looking_for: selectedPositions,
-    };
-  
-       await dispatch(createProject(payload)).unwrap().then(()=>{
-        toast({
-          title: "Success",
-          description: "Project created successfully!",
-        })
-      setOpen(false);
-      setFormData({
-        title: '',
-        description: '',
-        detailed_description: '',
-        image: undefined
-      });
+    
+    // Create a FormData object
+    const formDataToSend = new FormData();
+    
+    // Append form data
+    formDataToSend.append('title', formData.title);
+    formDataToSend.append('description', formData.description);
+    formDataToSend.append('detailed_description', formData.detailed_description);
+    if (formData.image) {
+        formDataToSend.append('image', formData.image); // Append the image file
+    }
+    
+    // Convert selectedOptions to numeric values and append each as a separate entry
+    const numericValues = selectedOptions.map(option => option.value); // Keep as strings
+    numericValues.forEach(value => {
+        formDataToSend.append('looking_for', value); // Append each value as a separate entry
+    });
 
-      }).catch((error)=>{
-        console.log(error)
-        toast({
-          title: "Error",
-          description: error.message ? error.message : "Failed to create project. Please try again.",
-          variant: "destructive",
-        })
-      })
+    console.log("Payload:", formDataToSend); // Log the payload to check values
 
-  }
+    await dispatch(createProject(formDataToSend)).unwrap().then(() => {
+        toast({
+            title: "Success",
+            description: "Project created successfully!",
+        });
+        setFormData({
+            title: '',
+            description: '',
+            detailed_description: '',
+            image: null
+        });
+        setSelectedOptions([]); // Reset selected options
+    }).catch((error) => {
+        console.log(error);
+        toast({
+            title: "Error",
+            description: error.message ? error.message : "Failed to create project. Please try again.",
+            variant: "destructive",
+        });
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -131,7 +162,10 @@ const PostModal = () => {
           </div>
           <div>
         <Label htmlFor="positions">Positions</Label>
-        <PositionMultiSelect onChange={setSelectedPositions} />
+        <MultiselectDropdown 
+          options={initialOptions} 
+          onChange={setSelectedOptions}
+        />
       </div>
 
           <Button 
